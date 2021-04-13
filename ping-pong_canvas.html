@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id='tenis' width=800 height=500></canvas>
+
+    <script>
+
+        const width = 800;
+        const height = 450;
+        const racketWidth = 15;
+        const racketHeigt = 100;
+        const radius = 25;
+        var scoreLeft = 0;
+        var scoreRight = 0;
+        var speedX = 2;                 //начальная скорость по х
+        var speedY = 1;                 //начальная скорость по y
+        var xPos = (width - 6) / 2;
+        var yPos = (height + 26) / 2
+        var fieldWidth = width - 6;
+        var fieldHeight = height - 53;
+        var topRacketLeft = 60;
+        var topRacketRight = 60;
+
+        // создаем задний фон игры
+        const rect = function () {
+            const canvasPathes = document.getElementById('tenis');
+            canvasPathes.parentElement.style.display = 'block';
+
+            if (canvasPathes && canvasPathes.getContext('2d')) {
+                let ctx = canvasPathes.getContext('2d');
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = '#ddf3dd';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.fillRect(0, 0, width, height)
+                ctx.strokeRect(0, 0, width, height);
+            }
+        }
+        rect();
+
+        // создаем игровое поле
+        const field = function () {
+            const canvasPathes = document.getElementById('tenis');
+            canvasPathes.parentElement.style.display = 'block';
+
+            if (canvasPathes && canvasPathes.getContext('2d')) {
+                let ctx = canvasPathes.getContext('2d');
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'green';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.fillRect(3, 50, fieldWidth, fieldHeight)
+                ctx.strokeRect(3, 50, fieldWidth, fieldHeight);
+            }
+        }
+        field();
+
+        //создаем мячик
+        const bounce = function () {
+            const canvasPathes = document.getElementById('tenis');
+            canvasPathes.parentElement.style.display = 'block';
+
+            if (canvasPathes && canvasPathes.getContext('2d')) {
+                let ctx = canvasPathes.getContext('2d');
+                // Обновляем страницу
+                function blank() {
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    rect();
+                    field();
+                    started();
+                    text();
+                    leftRacket();
+                    rightRacket();
+                    score();
+                    win();
+                }
+                blank();
+
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'yellow';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(xPos, yPos, radius, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.stroke();
+            }
+        }
+        // создаем левую ракетку
+        const leftRacket = function () {
+            const canvasPathes = document.getElementById('tenis');
+            canvasPathes.parentElement.style.display = 'block';
+
+            if (canvasPathes && canvasPathes.getContext('2d')) {
+                let ctx = canvasPathes.getContext('2d');
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'red';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.fillRect(6, topRacketLeft, racketWidth, racketHeigt);
+                ctx.strokeRect(6, topRacketLeft, racketWidth, racketHeigt);
+            }
+        }
+
+        // создаем правую ракетку
+        const rightRacket = function () {
+            const canvasPathes = document.getElementById('tenis');
+            canvasPathes.parentElement.style.display = 'block';
+
+            if (canvasPathes && canvasPathes.getContext('2d')) {
+                let ctx = canvasPathes.getContext('2d');
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'blue';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.fillRect(width - racketWidth - 6, topRacketRight, racketWidth, racketHeigt);
+                ctx.strokeRect(width - racketWidth - 6, topRacketRight, racketWidth, racketHeigt);
+            }
+        }
+
+        // создаем кнопку пуск
+        const started = function () {
+            const canvasPathes = document.getElementById('tenis');
+            canvasPathes.parentElement.style.display = 'block';
+
+            if (canvasPathes && canvasPathes.getContext('2d')) {
+                let ctx = canvasPathes.getContext('2d');
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'grey';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.fillRect(6, 6, 80, 30);
+                ctx.strokeRect(6, 6, 80, 30);
+            }
+        }
+        const text = function () {
+            const canvasPathes = document.getElementById('tenis');
+            canvasPathes.parentElement.style.display = 'block';
+
+            if (canvasPathes && canvasPathes.getContext('2d')) {
+                let ctx = canvasPathes.getContext('2d');
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'black';
+                ctx.lineWidth = 2;
+                ctx.font = 'italic bold 20px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('старт', 45, 26);
+            }
+        }
+        started();
+        text();
+
+        //создаем счет игры
+        const score = function () {
+            const canvasPathes = document.getElementById('tenis');
+            canvasPathes.parentElement.style.display = 'block';
+
+            if (canvasPathes && canvasPathes.getContext('2d')) {
+                let ctx = canvasPathes.getContext('2d');
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'black';
+                ctx.lineWidth = 1;
+                ctx.font = 'italic bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(scoreLeft + ":" + scoreRight, width / 2, 35);
+            }
+        }
+
+        // создаем текстовую строку "Обратный отсчет"
+        var number = "";
+        const countdown = function () {
+            const canvasPathes = document.getElementById('tenis');
+            canvasPathes.parentElement.style.display = 'block';
+
+            if (canvasPathes && canvasPathes.getContext('2d')) {
+                let ctx = canvasPathes.getContext('2d');
+                function blank() {
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    rect();
+                    field();
+                    started();
+                    text();
+                    bounce();
+                    leftRacket();
+                    rightRacket();
+                    score();
+                    win();
+                }
+                blank();
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'black';
+                ctx.lineWidth = 1;
+                ctx.font = 'italic bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(number, width / 2, 235);
+            }
+        }
+
+        // создаем текстовую строку "Победитель"
+        var colorite = "";
+        const win = function () {
+            const canvasPathes = document.getElementById('tenis');
+            canvasPathes.parentElement.style.display = 'block';
+
+            if (canvasPathes && canvasPathes.getContext('2d')) {
+                let ctx = canvasPathes.getContext('2d');
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'black';
+                ctx.lineWidth = 1;
+                ctx.font = 'italic bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(colorite, width / 2, 235);
+            }
+        }
+
+        var tickId;
+        var accselerationId;
+        var timerId;
+
+        //по нажатию на кнопку старт запускается функция.
+        var start = function start() {
+            xPos = (width - 6) / 2;
+            yPos = (height + 26) / 2;
+            speedY = Math.floor(((Math.random() * 5) < 2.5) ? -1 : 1) * (Math.random() * 5);
+            speedX = ((Math.random() < 0.5) ? -1 : 1) * speedX;
+            tickId = setInterval(tick, 1000 / 65);
+            accselerationId = setInterval(accseleration, 5000);
+        };
+
+        // функция ускорения мяча
+        function accseleration() {
+            if (speedX > 0) {
+                speedX++;
+            } else if (speedX < 0) {
+                speedX--;
+            }
+        };
+
+        //функция обновления
+        function restart() {
+            clearInterval(tickId);
+            clearInterval(accselerationId);
+            speedX = 2;
+            timerId = setInterval(timer, 1000);
+        };
+
+        //функция остановки игры и вывода информации о победителе
+        
+        function stop() {
+            if (scoreRight == 5) {
+                color = "синяя";
+            } else {
+                color = "зеленая";
+            };
+            colorite = "Победила " + color + " ракетка"
+            win();
+            clearInterval(tickId);
+            clearInterval(accselerationId);
+            clearInterval(timerId);
+        };
+
+        tenis.addEventListener("click", start);
+
+        // создаем обратный отсчет
+        var num = 4;
+        function timer() {
+            num --;
+            
+            number = "Игра начнется через " + num + " c";
+            countdown();
+            if (num == 0) {
+                num = 4;
+                start();
+                timerId = clearInterval(timerId);
+                
+            }
+        }
+
+        function tick() {
+            xPos += speedX;
+            // вылетел ли мяч правее стены?
+            if (xPos + radius > fieldWidth - 2) {
+                speedX = -speedX;
+                scoreLeft += 1;
+                restart();
+            }
+            // вылетел ли мяч левее стены?
+            if (xPos - radius < 7) {
+                speedX = -speedX;
+                scoreRight += 1;
+                restart();
+            }
+            // если счет достиг 5 очков то конец игры
+            if (scoreLeft == 5 || scoreRight == 5) {
+                stop();
+            };
+            yPos += speedY;
+            // вылетел ли мяч ниже пола?
+            if (yPos + radius > fieldHeight + 50) {
+                speedY = -speedY;
+            }
+            // вылетел ли мяч выше потолка?
+            if (yPos - radius < 50) {
+                speedY = -speedY;
+            }
+            //Варианты, когда шарик соприкасается с ракетками
+            // правая ракетка
+            if (xPos + radius > fieldWidth - 3 - racketWidth && yPos > topRacketRight && yPos < topRacketRight + racketHeigt) {
+                speedX = -speedX;
+            };
+            // левая ракетка
+            if (xPos - radius < racketWidth + 9 && yPos > topRacketLeft && yPos < topRacketLeft + racketHeigt) {
+                speedX = -speedX;
+            };
+            // передвижение ракеток в зависимости от нажатых клавиш
+            if (pressKeys[40] && topRacketRight <= fieldHeight - 55) {
+                topRacketRight += 4;
+            }
+            if (pressKeys[38] && topRacketRight > 53) {
+                topRacketRight -= 4;
+            }
+            if (pressKeys[17] && topRacketLeft <= fieldHeight - 55) {
+                topRacketLeft += 4;
+            }
+            if (pressKeys[16] && topRacketLeft > 53) {
+                topRacketLeft -= 4;
+            }
+            bounce();
+        };
+
+        // создаем функцию перемещения ракетки
+        var pressKeys = {};
+        addEventListener("keydown", function (event) {
+            if (event.keyCode) {
+                pressKeys[event.keyCode] = true;
+            }
+        });
+        addEventListener("keyup", function (event) {
+            if (event.keyCode) {
+                pressKeys[event.keyCode] = false;
+            }
+        });
+
+    </script>
+</body>
+
+</html>
